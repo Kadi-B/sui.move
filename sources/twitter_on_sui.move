@@ -45,19 +45,34 @@ public struct Post has key, store {
     post: String, 
 }
 
-public fun create_post(user: &mut userprofile, post: string, ctx: &mut TxContext) {   //&mut means you don't want the whole object just borrowing it
+public fun new_user(username: String, bio: String, ctx: &mut TxContext): UserProfile {
+    let user: UserProfile = UserProfile {
+        id: object::new(ctx:ctx),
+        username,
+        bio,
+        points: 0,
+        followers: 0,
+        following: 0,
+        posts: vector::empty(),
+    };
+
+    transfer::transfer(obj: user, recipient: ctx.sender());
+}
+
+public fun create_post(user: &mut userprofile, post: string, 
+ ctx: &mut TxContext) {   //&mut means you don't want the whole object just borrowing it
     let new_post: Post = Post {
-        id: object::new(ctx),
+        id: object::new(ctx: ctx),
         likes: 0,
         retweet: 0,
         repost: 0,
-        points_gein: 0
+        points_gen: 0,
         post,
     };
     
-    user.posts.push_back(e: new_post.id.to_inner());   //push_back is used to add an element to the end of a vector
-    user.points = user.points + 5;   //increment points by 5 for creating a post
-    transfer::public_share_object (obj: new_post)
+    user.posts.push_back(e: new_post.id.to_inner());                 //push_back is used to add an element to the end of a vector
+    user.points = user.points + 5;                                   //increment points by 5 for creating a post
+    transfer::public_share_object (obj: new_post);
 }
 
 
@@ -70,7 +85,3 @@ public fun create_post(user: &mut userprofile, post: string, ctx: &mut TxContext
 
 
 
-/*transfer::public
-transfer::tr
-
-*/ 
